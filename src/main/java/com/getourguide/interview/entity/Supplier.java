@@ -1,25 +1,29 @@
 package com.getourguide.interview.entity;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
-@Table(schema="getyourguide", name = "supplier")
+@Table(schema = "getyourguide", name = "supplier")
 @NoArgsConstructor
 public class Supplier {
-    @Id
-    private Long id;
-    private String name;
-    private String address;
-    private String zip;
-    private String city;
-    private String country;
-    @OneToMany(mappedBy = "supplier")
-    private List<Activity> activities;
+	@Id
+	private Long id;
+	private String name;
+	private String address;
+	private String zip;
+	private String city;
+	private String country;
+	@OneToMany(mappedBy = "supplier")
+	@JsonIgnoreProperties({ "supplier" })
+	private List<Activity> activities;
 }

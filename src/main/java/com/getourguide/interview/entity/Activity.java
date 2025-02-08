@@ -12,6 +12,8 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Data
 @Entity
 @Table(schema = "getyourguide", name = "activity")
@@ -27,5 +29,6 @@ public class Activity {
     private boolean specialOffer;
     @ManyToOne(fetch = FetchType.LAZY)
     @NotFound(action = NotFoundAction.IGNORE)
+    @JsonIgnoreProperties({"activities"})
     private Supplier supplier;
 }

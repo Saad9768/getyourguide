@@ -1,34 +1,35 @@
 package com.getourguide.interview.controller;
 
-import com.getourguide.interview.entity.Supplier;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Controller
+import com.getourguide.interview.dto.SupplierDto;
+import com.getourguide.interview.service.SupplierService;
+
+import lombok.AllArgsConstructor;
+
+@RestController
+@RequestMapping("/suppliers")
+@AllArgsConstructor
 public class SupplierController {
+    private final SupplierService supplierService;
 
-    @PersistenceContext
-    private EntityManager entityManager;
-
-    @GetMapping("/suppliers")
-    public ResponseEntity<List<Supplier>> suppliers() {
-        var list = (List<Supplier>) entityManager.createNativeQuery("SELECT * FROM GETYOURGUIDE.SUPPLIER", Supplier.class).getResultList();
-        return ResponseEntity.ok(list);
+    @GetMapping
+    public ResponseEntity<Page<SupplierDto>> getSuppliers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(supplierService.getSuppliers(page, size));
     }
 
-    @GetMapping("/suppliers/search/{search}")
-    public ResponseEntity<List<Supplier>> suppliersSearch(@PathVariable String search) {
-        var list = (List<Supplier>) entityManager.createNativeQuery("SELECT * FROM GETYOURGUIDE.SUPPLIER", Supplier.class).getResultList();
-        for(Supplier s: list) {
-            if(new StringBuilder().append(s.getName()).append(s.getAddress()).append(s.getZip()).append(s.getCity()).append(s.getCountry()).toString().contains(search)) {
-                return ResponseEntity.ok(List.of(s));
-            }
-        }
-        return ResponseEntity.ok(list);
+    @GetMapping("/search")
+    public ResponseEntity<Page<SupplierDto>> searchSuppliers(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(supplierService.searchSuppliers(query, page, size));
     }
 }

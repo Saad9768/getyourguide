@@ -1,9 +1,10 @@
 package com.getourguide.interview.dto;
 
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.getourguide.interview.entity.Supplier;
+
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -15,4 +16,6 @@ public class ActivityDto {
     private double rating;
     private boolean specialOffer;
     private String supplierName;
+    @JsonIgnoreProperties({"activities"})
+    private Supplier supplier;
 }
