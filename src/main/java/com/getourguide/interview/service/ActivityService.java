@@ -1,9 +1,12 @@
 package com.getourguide.interview.service;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.getourguide.interview.dto.ActivityDto;
@@ -15,38 +18,30 @@ import lombok.AllArgsConstructor;
 @Service
 @AllArgsConstructor
 public class ActivityService {
-    private final ActivityRepository activityRepository;
+	private final ActivityRepository activityRepository;
 
-    public List<ActivityDto> getActivities() {
-        return activityRepository.findAll()
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
+	public Page<ActivityDto> getActivities(int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Activity> activities = activityRepository.findAll(pageable);
 
-    public ActivityDto getActivity(Long activityId) {
-        return activityRepository.findById(activityId)
-                .map(this::convertToDto)
-                .orElse(null);
-    }
+		List<ActivityDto> activitiesDto = activities.getContent().stream().map(ActivityDto::convertToDto)
+				.collect(Collectors.toList());
 
-    public List<ActivityDto> searchActivities(String search) {
-        return activityRepository.findByTitleContaining(search)
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
+		return new PageImpl<>(activitiesDto, pageable, activities.getTotalElements());
+	}
 
-    private ActivityDto convertToDto(Activity activity) {
-        return ActivityDto.builder()
-                .id(activity.getId())
-                .title(activity.getTitle())
-                .price(activity.getPrice())
-                .currency(activity.getCurrency())
-                .rating(activity.getRating())
-                .specialOffer(activity.isSpecialOffer())
-                .supplier(activity.getSupplier())
-                .supplierName(Objects.isNull(activity.getSupplier()) ? "" : activity.getSupplier().getName())
-                .build();
-    }
+	public ActivityDto getActivity(Long activityId) {
+		return activityRepository.findById(activityId).map(ActivityDto::convertToDto)
+				.orElseThrow(() -> new IllegalArgumentException("Activity not found with ID: " + activityId));
+	}
+
+	public Page<ActivityDto> searchActivities(String search, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+
+		Page<Activity> activities = activityRepository.findByTitleContaining(search, pageable);
+		List<ActivityDto> activitiesDto = activities.getContent().stream().map(ActivityDto::convertToDto)
+				.collect(Collectors.toList());
+
+		return new PageImpl<>(activitiesDto, pageable, activities.getTotalElements());
+	}
 }

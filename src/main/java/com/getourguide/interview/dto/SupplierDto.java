@@ -24,8 +24,8 @@ public class SupplierDto {
     @JsonIgnoreProperties({ "supplier" })
     private List<Activity> activities;
 
-    // Convert Supplier entity → SupplierDto
-    public static SupplierDto fromEntity(Supplier supplier) {
+
+    public static SupplierDto convertToDto(Supplier supplier) {
         return SupplierDto.builder()
                 .id(supplier.getId())
                 .name(supplier.getName())

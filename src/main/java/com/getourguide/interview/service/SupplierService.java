@@ -25,7 +25,7 @@ public class SupplierService {
         Page<Supplier> suppliers = supplierRepository.findAll(pageable);
 
         List<SupplierDto> supplierDtos = suppliers.getContent().stream()
-                .map(SupplierDto::fromEntity)
+                .map(SupplierDto::convertToDto)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
@@ -38,7 +38,7 @@ public class SupplierService {
                         search, search, search, search, search, pageable);
 
         List<SupplierDto> supplierDtos = suppliers.getContent().stream()
-                .map(SupplierDto::fromEntity)
+                .map(SupplierDto::convertToDto)
                 .collect(Collectors.toList());
 
         return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
