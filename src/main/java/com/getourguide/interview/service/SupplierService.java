@@ -43,4 +43,16 @@ public class SupplierService {
 
         return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
     }
+
+    public SupplierDto addSupplier(SupplierDto supplierDto) {
+        Supplier supplier = new Supplier();
+        supplier.setName(supplierDto.getName());
+        supplier.setAddress(supplierDto.getAddress());
+        supplier.setZip(supplierDto.getZip());
+        supplier.setCity(supplierDto.getCity());
+        supplier.setCountry(supplierDto.getCountry());
+
+        Supplier savedSupplier = supplierRepository.save(supplier);
+        return SupplierDto.convertToDto(savedSupplier);
+    }
 }

@@ -23,9 +23,11 @@ public class ActivityDto {
     private double rating;
     private boolean specialOffer;
     private String supplierName;
+
     @JsonIgnoreProperties({"activities"})
     private Supplier supplier;
     
+    // Convert Activity Entity to DTO
     public static ActivityDto convertToDto(Activity activity) {
         return ActivityDto.builder()
                 .id(activity.getId())
@@ -36,6 +38,19 @@ public class ActivityDto {
                 .specialOffer(activity.isSpecialOffer())
                 .supplier(activity.getSupplier())
                 .supplierName(Objects.isNull(activity.getSupplier()) ? "" : activity.getSupplier().getName())
+                .build();
+    }
+
+
+    public static Activity convertToEntity(ActivityDto activityDto) {
+        return Activity.builder()
+                .id(activityDto.getId())
+                .title(activityDto.getTitle())
+                .price(activityDto.getPrice())
+                .currency(activityDto.getCurrency())
+                .rating(activityDto.getRating())
+                .specialOffer(activityDto.isSpecialOffer())
+                .supplier(activityDto.getSupplier()) // Set the Supplier
                 .build();
     }
 }
