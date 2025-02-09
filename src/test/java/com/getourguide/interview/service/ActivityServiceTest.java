@@ -35,7 +35,7 @@ class ActivityServiceTest {
         );
         when(activityRepository.findAll()).thenReturn(List.of(testActivity));
 
-        var result = activityService.getActivities();
+        var result = activityService.getActivities(0,10);
 
         Assertions.assertNotNull(result);
     }

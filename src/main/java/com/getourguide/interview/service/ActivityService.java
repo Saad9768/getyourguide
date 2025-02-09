@@ -56,7 +56,7 @@ public class ActivityService {
                 .orElseThrow(() -> new IllegalArgumentException("Supplier not found with ID: " + activityDto.getSupplier().getId()));
 
         activityDto.setSupplier(supplier);
-        Activity activity = activityDto.convertToEntity(activityDto);
+        Activity activity = ActivityDto.convertToEntity(activityDto);
 
         // Save the new Activity
         Activity savedActivity = activityRepository.save(activity);
