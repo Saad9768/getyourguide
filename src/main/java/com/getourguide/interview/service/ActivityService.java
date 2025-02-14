@@ -1,68 +1,68 @@
 package com.getourguide.interview.service;
 
-import com.getourguide.interview.controller.SupplierController;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.getourguide.interview.dto.ActivityDto;
 import com.getourguide.interview.entity.Activity;
+import com.getourguide.interview.entity.Supplier;
 import com.getourguide.interview.repository.ActivityRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import com.getourguide.interview.repository.SupplierRepository;
+
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class ActivityService {
-    private final ActivityRepository activityRepository;
-    private final SupplierController supplierController;
-    public List<ActivityDto> getActivities() {
-        List<Activity> activities = activityRepository.findAll();
-        List<ActivityDto> result = new ArrayList<>();
-        activities.stream().forEach(activity -> {
-            result.add(ActivityDto.builder()
-                    .id(activity.getId())
-                    .title(activity.getTitle())
-                    .price(activity.getPrice())
-                    .currency(activity.getCurrency())
-                    .rating(activity.getRating())
-                    .specialOffer(activity.isSpecialOffer())
-                    .supplierName(Objects.isNull(activity.getSupplier()) ? "" : activity.getSupplier().getName())
-                    .build());
-        });
-        return result;
+	private final ActivityRepository activityRepository;
+
+	private final SupplierRepository supplierRepository;
+
+	public Page<ActivityDto> getActivities(int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+		Page<Activity> activities = activityRepository.findAll(pageable);
+
+		List<ActivityDto> activitiesDto = activities.getContent().stream().map(ActivityDto::convertToDto)
+				.collect(Collectors.toList());
+
+		return new PageImpl<>(activitiesDto, pageable, activities.getTotalElements());
+	}
+
+	public ActivityDto getActivity(Long activityId) {
+		return activityRepository.findById(activityId).map(ActivityDto::convertToDto)
+				.orElseThrow(() -> new IllegalArgumentException("Activity not found with ID: " + activityId));
+	}
+
+	public Page<ActivityDto> searchActivities(String search, int page, int size) {
+		Pageable pageable = PageRequest.of(page, size);
+
+		Page<Activity> activities = activityRepository.findByTitleContaining(search, pageable);
+		List<ActivityDto> activitiesDto = activities.getContent().stream().map(ActivityDto::convertToDto)
+				.collect(Collectors.toList());
+
+		return new PageImpl<>(activitiesDto, pageable, activities.getTotalElements());
+	}
+
+    @Transactional
+    public ActivityDto addActivity(ActivityDto activityDto) {
+        Supplier supplier = supplierRepository.findById(activityDto.getSupplier().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Supplier not found with ID: " + activityDto.getSupplier().getId()));
+
+        activityDto.setSupplier(supplier);
+        Activity activity = ActivityDto.convertToEntity(activityDto);
+
+        // Save the new Activity
+        Activity savedActivity = activityRepository.save(activity);
+
+        // Convert back to DTO and return
+        return ActivityDto.convertToDto(savedActivity);
     }
 
-    public ActivityDto getActivities(Long activityId) {
-        List<Activity> activities = activityRepository.findAll();
-        List<ActivityDto> result = new ArrayList<>();
-        activities.stream().filter(activity -> activityId.equals(activity.getId())).forEach(activity -> {
-            result.add(ActivityDto.builder()
-                .id(activity.getId())
-                .title(activity.getTitle())
-                .price(activity.getPrice())
-                .currency(activity.getCurrency())
-                .rating(activity.getRating())
-                .specialOffer(activity.isSpecialOffer())
-                .supplierName(activity.getSupplier().getName())
-                .build());
-        });
-        return result.get(0);
-    }
-
-    public List<ActivityDto> searchActivities(String search) {
-        List<Activity> activities = activityRepository.findAll();
-        List<ActivityDto> result = new ArrayList<>();
-        activities.stream().filter(a -> a.getTitle().contains(search)).forEach(activity -> {
-            result.add(ActivityDto.builder()
-                .id(activity.getId())
-                .title(activity.getTitle())
-                .price(activity.getPrice())
-                .currency(activity.getCurrency())
-                .rating(activity.getRating())
-                .specialOffer(activity.isSpecialOffer())
-                .supplierName(activity.getSupplier().getName())
-                .build());
-        });
-        return result;
-    }
 }
