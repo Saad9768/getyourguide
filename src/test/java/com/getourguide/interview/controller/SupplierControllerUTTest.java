@@ -1,8 +1,13 @@
 package com.getourguide.interview.controller;
 
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpStatus.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.OK;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,8 +20,6 @@ import org.springframework.http.ResponseEntity;
 
 import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.service.SupplierService;
-
-import java.util.List;
 
 class SupplierControllerUTTest {
 

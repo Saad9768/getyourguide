@@ -22,14 +22,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import com.getourguide.interview.dto.ActivityDto;
-
 import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Activity;
 import com.getourguide.interview.entity.Supplier;
 import com.getourguide.interview.repository.ActivityRepository;
 import com.getourguide.interview.repository.SupplierRepository;
+import com.getourguide.interview.service.impl.ActivityServiceImpl;
 
-class ActivityServiceTest {
+class ActivityServiceImplTest {
 
 	@Mock
 	private ActivityRepository activityRepository;
@@ -38,7 +38,7 @@ class ActivityServiceTest {
 	private SupplierRepository supplierRepository;
 
 	@InjectMocks
-	private ActivityService activityService;
+	private ActivityServiceImpl activityService;
 
 	@BeforeEach
 	void setup() {
