@@ -25,7 +25,7 @@ public class SupplierService {
         Page<Supplier> suppliers = supplierRepository.findAll(pageable);
 
         List<SupplierDto> supplierDtos = suppliers.getContent().stream()
-                .map(SupplierDto::convertToDto)
+                .map(supplier -> SupplierDto.convertToDto(supplier, true))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
@@ -38,7 +38,7 @@ public class SupplierService {
                         search, search, search, search, search, pageable);
 
         List<SupplierDto> supplierDtos = suppliers.getContent().stream()
-                .map(SupplierDto::convertToDto)
+                .map(supplier -> SupplierDto.convertToDto(supplier, true))
                 .collect(Collectors.toList());
 
         return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
@@ -53,6 +53,6 @@ public class SupplierService {
         supplier.setCountry(supplierDto.getCountry());
 
         Supplier savedSupplier = supplierRepository.save(supplier);
-        return SupplierDto.convertToDto(savedSupplier);
+        return SupplierDto.convertToDto(savedSupplier, true);
     }
 }

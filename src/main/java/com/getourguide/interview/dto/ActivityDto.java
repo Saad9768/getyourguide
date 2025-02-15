@@ -31,7 +31,7 @@ public class ActivityDto {
     	if(activity == null) {
     		return null;
     	}
-    	SupplierDto supplierDto = SupplierDto.convertToDto(activity.getSupplier());
+    	SupplierDto supplierDto = SupplierDto.convertToDto(activity.getSupplier(), false);
         return ActivityDto.builder()
                 .id(activity.getId())
                 .title(activity.getTitle())

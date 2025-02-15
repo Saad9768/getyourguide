@@ -3,7 +3,7 @@ package com.getourguide.interview.entity;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,6 +35,6 @@ public class Activity {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @NotFound(action = NotFoundAction.IGNORE)
-    @JsonBackReference
+    @JsonIgnoreProperties({"activities"})
     private Supplier supplier;
 }

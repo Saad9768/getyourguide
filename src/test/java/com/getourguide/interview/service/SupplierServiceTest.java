@@ -48,7 +48,7 @@ public class SupplierServiceTest {
         supplier.setCity("Test City");
         supplier.setCountry("Test Country");
 
-        supplierDto = SupplierDto.convertToDto(supplier);
+        supplierDto = SupplierDto.convertToDto(supplier,true);
         pageable = PageRequest.of(0, 10);
     }
 
