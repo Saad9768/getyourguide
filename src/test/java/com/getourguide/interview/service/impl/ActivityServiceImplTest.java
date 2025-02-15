@@ -1,4 +1,4 @@
-package com.getourguide.interview.service;
+package com.getourguide.interview.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

@@ -1,4 +1,4 @@
-package com.getourguide.interview.service;
+package com.getourguide.interview.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +23,6 @@ import org.springframework.data.domain.Pageable;
 import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Supplier;
 import com.getourguide.interview.repository.SupplierRepository;
-import com.getourguide.interview.service.impl.SupplierServiceImpl;
 
 public class SupplierServiceImplTest {
 
