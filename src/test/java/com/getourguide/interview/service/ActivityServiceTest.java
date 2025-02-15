@@ -22,6 +22,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
 import com.getourguide.interview.dto.ActivityDto;
+
+import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Activity;
 import com.getourguide.interview.entity.Supplier;
 import com.getourguide.interview.repository.ActivityRepository;
@@ -114,14 +116,15 @@ class ActivityServiceTest {
 	@Test
 	void testAddActivity_Success() {
 		// Arrange
-		Supplier supplier = new Supplier();
-		supplier.setId(1L);
-		supplier.setName("Test Supplier");
+		SupplierDto supplierDto = new SupplierDto();
+		supplierDto.setId(1L);
+		supplierDto.setName("Test Supplier");
 
 		ActivityDto activityDto = new ActivityDto();
 		activityDto.setTitle("New Activity");
-		activityDto.setSupplier(supplier);
-
+		activityDto.setSupplier(supplierDto);
+		
+		Supplier supplier = SupplierDto.convertToEntity(supplierDto);
 		Activity activity = new Activity();
 		activity.setId(1L);
 		activity.setTitle("New Activity");
@@ -144,9 +147,9 @@ class ActivityServiceTest {
 	void testAddActivity_SupplierNotFound() {
 		// Arrange
 		ActivityDto activityDto = new ActivityDto();
-		Supplier supplier = new Supplier();
-		supplier.setId(1L);
-		activityDto.setSupplier(supplier);
+		SupplierDto supplierDto = new SupplierDto();
+		supplierDto.setId(1L);
+		activityDto.setSupplier(supplierDto);
 
 		when(supplierRepository.findById(1L)).thenReturn(Optional.empty());
 

@@ -1,11 +1,5 @@
 package com.getourguide.interview.controller;
 
-import com.getourguide.interview.dto.ActivityDto;
-import com.getourguide.interview.dto.SupplierDto;
-import com.getourguide.interview.service.ActivityService;
-import java.util.List;
-import lombok.AllArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.getourguide.interview.dto.ActivityDto;
+import com.getourguide.interview.service.ActivityService;
+
+import lombok.AllArgsConstructor;
 
 @RestController
 @RequestMapping("/activities")

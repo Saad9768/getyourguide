@@ -1,12 +1,16 @@
 package com.getourguide.interview.dto;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.getourguide.interview.entity.Activity;
 import com.getourguide.interview.entity.Supplier;
 
-import lombok.*;
-
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Builder
@@ -22,10 +26,19 @@ public class SupplierDto {
     private String country;
 
     @JsonIgnoreProperties({ "supplier" })
-    private List<Activity> activities;
+    private List<ActivityDto> activities;
 
 
     public static SupplierDto convertToDto(Supplier supplier) {
+    	if(supplier == null) {
+    		return null;
+    	}
+    	List<ActivityDto> activityDtoList = null;
+    	if(supplier.getActivities() != null) {
+    		activityDtoList = supplier.getActivities().stream().map(ActivityDto::convertToDto)
+        			.collect(Collectors.toList());
+    	}
+    	
         return SupplierDto.builder()
                 .id(supplier.getId())
                 .name(supplier.getName())
@@ -33,7 +46,28 @@ public class SupplierDto {
                 .zip(supplier.getZip())
                 .city(supplier.getCity())
                 .country(supplier.getCountry())
-                .activities(supplier.getActivities())
+                .activities(activityDtoList)
+                .build();
+    }
+    
+    public static Supplier convertToEntity(SupplierDto supplierDto) {
+    	if(supplierDto == null) {
+    		return null;
+    	}
+    	
+    	List<Activity> activityList = null;
+    	if(supplierDto.getActivities() != null) {
+    		activityList = supplierDto.getActivities().stream().map(ActivityDto::convertToEntity)
+    				.collect(Collectors.toList());
+    	}
+        return Supplier.builder()
+        		.id(supplierDto.getId())
+                .name(supplierDto.getName())
+                .address(supplierDto.getAddress())
+                .zip(supplierDto.getZip())
+                .city(supplierDto.getCity())
+                .country(supplierDto.getCountry())
+                .activities(activityList)
                 .build();
     }
 }

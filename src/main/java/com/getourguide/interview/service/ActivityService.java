@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.getourguide.interview.dto.ActivityDto;
+import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Activity;
 import com.getourguide.interview.entity.Supplier;
 import com.getourguide.interview.repository.ActivityRepository;
@@ -55,7 +56,7 @@ public class ActivityService {
         Supplier supplier = supplierRepository.findById(activityDto.getSupplier().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Supplier not found with ID: " + activityDto.getSupplier().getId()));
 
-        activityDto.setSupplier(supplier);
+        activityDto.setSupplier(SupplierDto.convertToDto(supplier));
         Activity activity = ActivityDto.convertToEntity(activityDto);
 
         // Save the new Activity

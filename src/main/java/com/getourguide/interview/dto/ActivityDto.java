@@ -23,12 +23,15 @@ public class ActivityDto {
     private double rating;
     private boolean specialOffer;
     private String supplierName;
-
+ 
     @JsonIgnoreProperties({"activities"})
-    private Supplier supplier;
+    private SupplierDto supplier;
     
-    // Convert Activity Entity to DTO
     public static ActivityDto convertToDto(Activity activity) {
+    	if(activity == null) {
+    		return null;
+    	}
+    	SupplierDto supplierDto = SupplierDto.convertToDto(activity.getSupplier());
         return ActivityDto.builder()
                 .id(activity.getId())
                 .title(activity.getTitle())
@@ -36,13 +39,17 @@ public class ActivityDto {
                 .currency(activity.getCurrency())
                 .rating(activity.getRating())
                 .specialOffer(activity.isSpecialOffer())
-                .supplier(activity.getSupplier())
-                .supplierName(Objects.isNull(activity.getSupplier()) ? "" : activity.getSupplier().getName())
+                .supplier(supplierDto)
+                .supplierName(Objects.isNull(supplierDto) ? "" : supplierDto.getName())
                 .build();
     }
 
 
     public static Activity convertToEntity(ActivityDto activityDto) {
+    	if(activityDto == null) {
+    		return null;
+    	}
+    	Supplier supplier = SupplierDto.convertToEntity(activityDto.getSupplier());
         return Activity.builder()
                 .id(activityDto.getId())
                 .title(activityDto.getTitle())
@@ -50,7 +57,7 @@ public class ActivityDto {
                 .currency(activityDto.getCurrency())
                 .rating(activityDto.getRating())
                 .specialOffer(activityDto.isSpecialOffer())
-                .supplier(activityDto.getSupplier()) // Set the Supplier
+                .supplier(supplier)
                 .build();
     }
 }
