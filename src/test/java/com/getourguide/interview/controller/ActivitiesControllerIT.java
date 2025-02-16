@@ -1,6 +1,6 @@
 package com.getourguide.interview.controller;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -99,7 +99,6 @@ public class ActivitiesControllerIT {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Hamburg Cruise"));
 
-        // Verify that it was saved in the database
-        assertThat(activityRepository.findAll()).hasSize(3);
+		assertEquals(3, activityRepository.findAll().size());
     }
 }
