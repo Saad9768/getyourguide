@@ -8,13 +8,13 @@ import com.getourguide.interview.entity.Activity;
 
 import jakarta.annotation.PostConstruct;
 
-@Component
-public class ActivityDTOCustomMappingComponent {
-
+//@Component
+public class ActivityDTOCustomMapping {
 	@Autowired
 	private ModelMapper modelMapper;
 
 	public void configureMappings() {
+		System.out.println("Herere------------------------------------------------------");
 		modelMapper.typeMap(Activity.class, ActivityDto.class).addMapping(src -> src.getSupplier().getName(),
 				ActivityDto::setSupplierName);
 	}

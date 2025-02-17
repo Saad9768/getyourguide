@@ -1,5 +1,8 @@
 package com.getourguide.interview.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -18,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Table(schema = "getyourguide", name = "activity")
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Activity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
