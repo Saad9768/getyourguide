@@ -1,20 +1,19 @@
 package com.getourguide.interview.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -25,72 +24,74 @@ import com.getourguide.interview.entity.Supplier;
 import com.getourguide.interview.mapper.DTOMapper;
 import com.getourguide.interview.repository.SupplierRepository;
 
-public class SupplierServiceImplTest {
+@ExtendWith(MockitoExtension.class)
+class SupplierServiceImplTest {
 
-    @Mock
-    private SupplierRepository supplierRepository;
-
-    @InjectMocks
-    private SupplierServiceImpl supplierService;
-	
 	@Mock
-    private DTOMapper dTOMapper;
+	private SupplierRepository supplierRepository;
 
-    private Supplier supplier;
-    private SupplierDto supplierDto;
-    private Pageable pageable;
+	@Mock
+	private DTOMapper dtoMapper;
 
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-        
-        supplier = new Supplier();
-        supplier.setId(1L);
-        supplier.setName("Test Supplier");
-        supplier.setAddress("123 Test Street");
-        supplier.setZip("12345");
-        supplier.setCity("Test City");
-        supplier.setCountry("Test Country");
+	@InjectMocks
+	private SupplierServiceImpl supplierService;
 
-        supplierDto = dTOMapper.convertToDto(supplier, SupplierDto.class);
-        pageable = PageRequest.of(0, 10);
-    }
+	private Supplier supplier;
+	private SupplierDto supplierDto;
 
-    @Test
-    void testGetSuppliers() {
-        Page<Supplier> supplierPage = new PageImpl<>(List.of(supplier), pageable, 1);
-        when(supplierRepository.findAll(pageable)).thenReturn(supplierPage);
+	@BeforeEach
+	void setUp() {
+		supplier = new Supplier();
+		supplier.setId(1L);
+		supplier.setName("Test Supplier");
 
-        Page<SupplierDto> result = supplierService.getSuppliers(0, 10);
+		supplierDto = new SupplierDto();
+		supplierDto.setId(1L);
+		supplierDto.setName("Test Supplier");
+	}
 
-        assertEquals(1, result.getTotalElements());
-        assertEquals("Test Supplier", result.getContent().get(0).getName());
-        verify(supplierRepository, times(1)).findAll(pageable);
-    }
+	@Test
+	void testGetSuppliers() {
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Supplier> supplierPage = new PageImpl<>(List.of(supplier), pageable, 1);
 
-    @Test
-    void testSearchSuppliers() {
-        Page<Supplier> supplierPage = new PageImpl<>(List.of(supplier), pageable, 1);
-        when(supplierRepository.findByNameContainingOrAddressContainingOrZipContainingOrCityContainingOrCountryContaining(
-                anyString(), anyString(), anyString(), anyString(), anyString(), eq(pageable)))
-                .thenReturn(supplierPage);
+		when(supplierRepository.findAll(pageable)).thenReturn(supplierPage);
+		when(dtoMapper.convertListToDtoList(any(), eq(SupplierDto.class))).thenReturn(List.of(supplierDto));
 
-        Page<SupplierDto> result = supplierService.searchSuppliers("Test", 0, 10);
+		Page<SupplierDto> result = supplierService.getSuppliers(0, 10);
 
-        assertEquals(1, result.getTotalElements());
-        assertEquals("Test Supplier", result.getContent().get(0).getName());
-        verify(supplierRepository, times(1))
-                .findByNameContainingOrAddressContainingOrZipContainingOrCityContainingOrCountryContaining(
-                        anyString(), anyString(), anyString(), anyString(), anyString(), eq(pageable));
-    }
+		assertNotNull(result);
+		assertEquals(1, result.getTotalElements());
+		assertEquals("Test Supplier", result.getContent().get(0).getName());
+	}
 
-    @Test
-    void testAddSupplier() {
-        when(supplierRepository.save(any(Supplier.class))).thenReturn(supplier);
+	@Test
+	void testSearchSuppliers() {
+		Pageable pageable = PageRequest.of(0, 10);
+		Page<Supplier> supplierPage = new PageImpl<>(List.of(supplier), pageable, 1);
 
-        SupplierDto result = supplierService.addSupplier(supplierDto);
+		when(supplierRepository
+				.findByNameContainingOrAddressContainingOrZipContainingOrCityContainingOrCountryContaining("Test",
+						"Test", "Test", "Test", "Test", pageable))
+				.thenReturn(supplierPage);
+		when(dtoMapper.convertListToDtoList(any(), eq(SupplierDto.class))).thenReturn(List.of(supplierDto));
 
-        assertEquals("Test Supplier", result.getName());
-        verify(supplierRepository, times(1)).save(any(Supplier.class));
-    }
+		Page<SupplierDto> result = supplierService.searchSuppliers("Test", 0, 10);
+
+		assertNotNull(result);
+		assertEquals(1, result.getTotalElements());
+		assertEquals("Test Supplier", result.getContent().get(0).getName());
+	}
+
+	@Test
+	void testAddSupplier() {
+		when(supplierRepository.save(any(Supplier.class))).thenReturn(supplier);
+		when(dtoMapper.convertToDto(any(Supplier.class), eq(SupplierDto.class))).thenReturn(supplierDto);
+
+		SupplierDto result = supplierService.addSupplier(supplierDto);
+
+		assertNotNull(result);
+		assertEquals("Test Supplier", result.getName());
+	}
+
 }

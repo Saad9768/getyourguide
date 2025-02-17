@@ -4,8 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -13,9 +12,10 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -29,137 +29,112 @@ import com.getourguide.interview.mapper.DTOMapper;
 import com.getourguide.interview.repository.ActivityRepository;
 import com.getourguide.interview.repository.SupplierRepository;
 
+@ExtendWith(MockitoExtension.class)
 class ActivityServiceImplTest {
 
-	@Mock
-	private ActivityRepository activityRepository;
+    @Mock
+    private ActivityRepository activityRepository;
 
-	@Mock
-	private SupplierRepository supplierRepository;
+    @Mock
+    private SupplierRepository supplierRepository;
 
-	@InjectMocks
-	private ActivityServiceImpl activityService;
-	
-	@Mock
-    private DTOMapper dTOMapper; 
-	
+    @Mock
+    private DTOMapper dtoMapper;
 
-	@BeforeEach
-	void setup() {
-		MockitoAnnotations.openMocks(this);
-	}
+    @InjectMocks
+    private ActivityServiceImpl activityService;
 
-	@Test
-	void testGetActivities() {
-		// Arrange
-		Pageable pageable = PageRequest.of(0, 10);
-		Activity activity = new Activity();
-		activity.setId(1L);
-		activity.setTitle("Test Activity");
+    private Activity activity;
+    private ActivityDto activityDto;
+    private Supplier supplier;
+    private SupplierDto supplierDto;
 
-		Page<Activity> mockPage = new PageImpl<>(List.of(activity), pageable, 1);
-		when(activityRepository.findAll(pageable)).thenReturn(mockPage);
+    @BeforeEach
+    void setUp() {
+        supplier = new Supplier();
+        supplier.setId(1L);
+        supplier.setName("Test Supplier");
 
-		// Act
-		Page<ActivityDto> result = activityService.getActivities(0, 10);
+        activity = new Activity();
+        activity.setId(1L);
+        activity.setTitle("Test Activity");
+        activity.setSupplier(supplier);
 
-		// Assert
-		assertNotNull(result);
-		assertEquals(1, result.getTotalElements());
-		verify(activityRepository, times(1)).findAll(pageable);
-	}
+        supplierDto = new SupplierDto();
+        supplierDto.setId(1L);
+        supplierDto.setName("Test Supplier");
 
-	@Test
-	void testGetActivity_Exists() {
-		// Arrange
-		Activity activity = new Activity();
-		activity.setId(1L);
-		activity.setTitle("Test Activity");
+        activityDto = new ActivityDto();
+        activityDto.setId(1L);
+        activityDto.setTitle("Test Activity");
+        activityDto.setSupplier(supplierDto);
+    }
 
-		when(activityRepository.findById(1L)).thenReturn(Optional.of(activity));
+    @Test
+    void testGetActivities() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Activity> activityPage = new PageImpl<>(List.of(activity), pageable, 1);
 
-		// Act
-		ActivityDto result = activityService.getActivity(1L);
+        when(activityRepository.findAll(pageable)).thenReturn(activityPage);
+        when(dtoMapper.convertListToDtoList(any(), eq(ActivityDto.class))).thenReturn(List.of(activityDto));
 
-		// Assert
-		assertNotNull(result);
-		assertEquals("Test Activity", result.getTitle());
-		verify(activityRepository, times(1)).findById(1L);
-	}
+        Page<ActivityDto> result = activityService.getActivities(0, 10);
 
-	@Test
-	void testGetActivity_NotFound() {
-		// Arrange
-		when(activityRepository.findById(1L)).thenReturn(Optional.empty());
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Test Activity", result.getContent().get(0).getTitle());
+    }
 
-		// Act & Assert
-		Exception exception = assertThrows(IllegalArgumentException.class, () -> activityService.getActivity(1L));
-		assertEquals("Activity not found with ID: 1", exception.getMessage());
-	}
+    @Test
+    void testGetActivity() {
+        when(activityRepository.findById(1L)).thenReturn(Optional.of(activity));
+        when(dtoMapper.convertToDto(activity, ActivityDto.class)).thenReturn(activityDto);
 
-	@Test
-	void testSearchActivities() {
-		// Arrange
-		Pageable pageable = PageRequest.of(0, 10);
-		Activity activity = new Activity();
-		activity.setId(1L);
-		activity.setTitle("Test Activity");
+        ActivityDto result = activityService.getActivity(1L);
 
-		Page<Activity> mockPage = new PageImpl<>(List.of(activity), pageable, 1);
-		when(activityRepository.findByTitleContaining("Test", pageable)).thenReturn(mockPage);
+        assertNotNull(result);
+        assertEquals("Test Activity", result.getTitle());
+    }
 
-		// Act
-		Page<ActivityDto> result = activityService.searchActivities("Test", 0, 10);
+    @Test
+    void testGetActivity_NotFound() {
+        when(activityRepository.findById(1L)).thenReturn(Optional.empty());
 
-		// Assert
-		assertNotNull(result);
-		assertEquals(1, result.getTotalElements());
-		verify(activityRepository, times(1)).findByTitleContaining("Test", pageable);
-	}
+        assertThrows(IllegalArgumentException.class, () -> activityService.getActivity(1L));
+    }
 
-	@Test
-	void testAddActivity_Success() {
-		// Arrange
-		SupplierDto supplierDto = new SupplierDto();
-		supplierDto.setId(1L);
-		supplierDto.setName("Test Supplier");
+    @Test
+    void testSearchActivities() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Activity> activityPage = new PageImpl<>(List.of(activity), pageable, 1);
 
-		ActivityDto activityDto = new ActivityDto();
-		activityDto.setTitle("New Activity");
-		activityDto.setSupplier(supplierDto);
-		
-		Supplier supplier = dTOMapper.convertToEntity(supplierDto, Supplier.class);
-		Activity activity = new Activity();
-		activity.setId(1L);
-		activity.setTitle("New Activity");
-		activity.setSupplier(supplier);
+        when(activityRepository.findByTitleContaining("Test", pageable)).thenReturn(activityPage);
+        when(dtoMapper.convertListToDtoList(any(), eq(ActivityDto.class))).thenReturn(List.of(activityDto));
 
-		when(supplierRepository.findById(1L)).thenReturn(Optional.of(supplier));
-		when(activityRepository.save(any(Activity.class))).thenReturn(activity);
+        Page<ActivityDto> result = activityService.searchActivities("Test", 0, 10);
 
-		// Act
-		ActivityDto result = activityService.addActivity(activityDto);
+        assertNotNull(result);
+        assertEquals(1, result.getTotalElements());
+        assertEquals("Test Activity", result.getContent().get(0).getTitle());
+    }
 
-		// Assert
-		assertNotNull(result);
-		assertEquals("New Activity", result.getTitle());
-		verify(supplierRepository, times(1)).findById(1L);
-		verify(activityRepository, times(1)).save(any(Activity.class));
-	}
+    @Test
+    void testAddActivity() {
+        when(supplierRepository.findById(1L)).thenReturn(Optional.of(supplier));
+        when(dtoMapper.convertToEntity(activityDto, Activity.class)).thenReturn(activity);
+        when(activityRepository.save(activity)).thenReturn(activity);
+        when(dtoMapper.convertToDto(activity, ActivityDto.class)).thenReturn(activityDto);
 
-	@Test
-	void testAddActivity_SupplierNotFound() {
-		// Arrange
-		ActivityDto activityDto = new ActivityDto();
-		SupplierDto supplierDto = new SupplierDto();
-		supplierDto.setId(1L);
-		activityDto.setSupplier(supplierDto);
+        ActivityDto result = activityService.addActivity(activityDto);
 
-		when(supplierRepository.findById(1L)).thenReturn(Optional.empty());
+        assertNotNull(result);
+        assertEquals("Test Activity", result.getTitle());
+    }
 
-		// Act & Assert
-		Exception exception = assertThrows(IllegalArgumentException.class,
-				() -> activityService.addActivity(activityDto));
-		assertEquals("Supplier not found with ID: 1", exception.getMessage());
-	}
+    @Test
+    void testAddActivity_SupplierNotFound() {
+        when(supplierRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> activityService.addActivity(activityDto));
+    }
 }

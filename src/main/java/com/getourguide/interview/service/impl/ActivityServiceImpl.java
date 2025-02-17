@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.getourguide.interview.dto.ActivityDto;
-import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Activity;
 import com.getourguide.interview.entity.Supplier;
 import com.getourguide.interview.mapper.DTOMapper;

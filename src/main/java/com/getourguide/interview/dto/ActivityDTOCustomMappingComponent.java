@@ -16,10 +16,10 @@ public class ActivityDTOCustomMappingComponent {
 	private ModelMapper modelMapper;
 
 	public void configureMappings() {
-		modelMapper.typeMap(Activity.class, ActivityDto.class)
-				.addMapping(src -> src.getSupplier().getName(), ActivityDto::setSupplierName);
+		modelMapper.typeMap(Activity.class, ActivityDto.class).addMapping(src -> src.getSupplier().getName(),
+				ActivityDto::setSupplierName);
 
-		modelMapper.typeMap(Supplier.class, SupplierDto.class); 
+		modelMapper.typeMap(Supplier.class, SupplierDto.class);
 	}
 
 	public void configureMappings1() {
@@ -32,12 +32,7 @@ public class ActivityDTOCustomMappingComponent {
 
 	@PostConstruct
 	private void postConstruct() {
-
-		System.out.println(
-				"========chafdsdfvghjabsdhjasbhj=========");
-
 		configureMappings();
-//		configureMappings1();
 	}
 
 }
