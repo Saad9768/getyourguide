@@ -1,9 +1,7 @@
 package com.getourguide.interview.entity;
 
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -23,18 +21,18 @@ import lombok.NoArgsConstructor;
 @Table(schema = "getyourguide", name = "activity")
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Activity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String title;
-    private int price;
-    private String currency;
-    private double rating;
-    private boolean specialOffer;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @NotFound(action = NotFoundAction.IGNORE)
-    @JsonIgnoreProperties({"activities"})
-    private Supplier supplier;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	private String title;
+	private int price;
+	private String currency;
+	private double rating;
+	private boolean specialOffer;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+	private Supplier supplier;
 }
