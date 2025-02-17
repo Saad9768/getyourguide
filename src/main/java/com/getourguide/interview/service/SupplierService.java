@@ -1,58 +1,14 @@
 package com.getourguide.interview.service;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 
 import com.getourguide.interview.dto.SupplierDto;
-import com.getourguide.interview.entity.Supplier;
-import com.getourguide.interview.repository.SupplierRepository;
 
-import lombok.AllArgsConstructor;
-import java.util.List;
-import java.util.stream.Collectors;
+public interface SupplierService {
+	Page<SupplierDto> getSuppliers(int page, int size);
 
-@Service
-@AllArgsConstructor
-public class SupplierService {
+	Page<SupplierDto> searchSuppliers(String search, int page, int size);
 
-    private final SupplierRepository supplierRepository;
+	SupplierDto addSupplier(SupplierDto supplierDto);
 
-    public Page<SupplierDto> getSuppliers(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Supplier> suppliers = supplierRepository.findAll(pageable);
-
-        List<SupplierDto> supplierDtos = suppliers.getContent().stream()
-                .map(supplier -> SupplierDto.convertToDto(supplier, true))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
-    }
-
-    public Page<SupplierDto> searchSuppliers(String search, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Supplier> suppliers = supplierRepository
-                .findByNameContainingOrAddressContainingOrZipContainingOrCityContainingOrCountryContaining(
-                        search, search, search, search, search, pageable);
-
-        List<SupplierDto> supplierDtos = suppliers.getContent().stream()
-                .map(supplier -> SupplierDto.convertToDto(supplier, true))
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
-    }
-
-    public SupplierDto addSupplier(SupplierDto supplierDto) {
-        Supplier supplier = new Supplier();
-        supplier.setName(supplierDto.getName());
-        supplier.setAddress(supplierDto.getAddress());
-        supplier.setZip(supplierDto.getZip());
-        supplier.setCity(supplierDto.getCity());
-        supplier.setCountry(supplierDto.getCountry());
-
-        Supplier savedSupplier = supplierRepository.save(supplier);
-        return SupplierDto.convertToDto(savedSupplier, true);
-    }
 }

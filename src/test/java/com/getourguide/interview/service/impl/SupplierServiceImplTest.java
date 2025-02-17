@@ -1,4 +1,4 @@
-package com.getourguide.interview.service;
+package com.getourguide.interview.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,13 +24,13 @@ import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Supplier;
 import com.getourguide.interview.repository.SupplierRepository;
 
-public class SupplierServiceTest {
+public class SupplierServiceImplTest {
 
     @Mock
     private SupplierRepository supplierRepository;
 
     @InjectMocks
-    private SupplierService supplierService;
+    private SupplierServiceImpl supplierService;
 
     private Supplier supplier;
     private SupplierDto supplierDto;
@@ -48,7 +48,7 @@ public class SupplierServiceTest {
         supplier.setCity("Test City");
         supplier.setCountry("Test Country");
 
-        supplierDto = SupplierDto.convertToDto(supplier,true);
+        supplierDto = SupplierDto.convertToDto(supplier,false);
         pageable = PageRequest.of(0, 10);
     }
 
