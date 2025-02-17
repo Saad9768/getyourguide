@@ -25,9 +25,9 @@ import com.getourguide.interview.dto.ActivityDto;
 import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Activity;
 import com.getourguide.interview.entity.Supplier;
+import com.getourguide.interview.mapper.DTOMapper;
 import com.getourguide.interview.repository.ActivityRepository;
 import com.getourguide.interview.repository.SupplierRepository;
-import com.getourguide.interview.service.impl.ActivityServiceImpl;
 
 class ActivityServiceImplTest {
 
@@ -39,6 +39,10 @@ class ActivityServiceImplTest {
 
 	@InjectMocks
 	private ActivityServiceImpl activityService;
+	
+	@Mock
+    private DTOMapper dTOMapper; 
+	
 
 	@BeforeEach
 	void setup() {
@@ -124,7 +128,7 @@ class ActivityServiceImplTest {
 		activityDto.setTitle("New Activity");
 		activityDto.setSupplier(supplierDto);
 		
-		Supplier supplier = SupplierDto.convertToEntity(supplierDto);
+		Supplier supplier = dTOMapper.convertToEntity(supplierDto, Supplier.class);
 		Activity activity = new Activity();
 		activity.setId(1L);
 		activity.setTitle("New Activity");

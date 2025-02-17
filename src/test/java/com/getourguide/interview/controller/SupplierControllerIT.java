@@ -70,8 +70,12 @@ public class SupplierControllerIT {
 
     @Test
     void testAddSupplier() throws Exception {
-        SupplierDto supplierDto = new SupplierDto(null, "New Supplier", "New Address", "20002", "Hamburg", "Germany", null);
-
+        SupplierDto supplierDto = new SupplierDto();
+        supplierDto.setName("New Supplier");
+        supplierDto.setAddress("New Address");
+        supplierDto.setZip("20002");
+        supplierDto.setCity("Hamburg");
+        supplierDto.setCountry("Germany");
         mockMvc.perform(post("/suppliers")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(supplierDto)))

@@ -1,7 +1,6 @@
 package com.getourguide.interview.service.impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -14,6 +13,7 @@ import com.getourguide.interview.dto.ActivityDto;
 import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Activity;
 import com.getourguide.interview.entity.Supplier;
+import com.getourguide.interview.mapper.DTOMapper;
 import com.getourguide.interview.repository.ActivityRepository;
 import com.getourguide.interview.repository.SupplierRepository;
 import com.getourguide.interview.service.ActivityService;
@@ -26,22 +26,25 @@ public class ActivityServiceImpl implements ActivityService {
 	private final ActivityRepository activityRepository;
 
 	private final SupplierRepository supplierRepository;
+	
+	private final DTOMapper dtoMapper;
 
 	@Override
 	public Page<ActivityDto> getActivities(int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
 		Page<Activity> activities = activityRepository.findAll(pageable);
-
-		List<ActivityDto> activitiesDto = activities.getContent().stream().map(ActivityDto::convertToDto)
-				.collect(Collectors.toList());
+		
+		List<ActivityDto> activitiesDto = dtoMapper.convertListToDtoList(activities.getContent(), ActivityDto.class);
 
 		return new PageImpl<>(activitiesDto, pageable, activities.getTotalElements());
 	}
 
 	@Override
 	public ActivityDto getActivity(Long activityId) {
-		return activityRepository.findById(activityId).map(ActivityDto::convertToDto)
+		Activity activity  = activityRepository.findById(activityId)
 				.orElseThrow(() -> new IllegalArgumentException("Activity not found with ID: " + activityId));
+		
+		return dtoMapper.convertToDto(activity, ActivityDto.class);
 	}
 
 	@Override
@@ -49,8 +52,8 @@ public class ActivityServiceImpl implements ActivityService {
 		Pageable pageable = PageRequest.of(page, size);
 
 		Page<Activity> activities = activityRepository.findByTitleContaining(search, pageable);
-		List<ActivityDto> activitiesDto = activities.getContent().stream().map(ActivityDto::convertToDto)
-				.collect(Collectors.toList());
+		
+		List<ActivityDto> activitiesDto = dtoMapper.convertListToDtoList(activities.getContent(), ActivityDto.class);
 
 		return new PageImpl<>(activitiesDto, pageable, activities.getTotalElements());
 	}
@@ -58,17 +61,19 @@ public class ActivityServiceImpl implements ActivityService {
     @Transactional
     @Override
     public ActivityDto addActivity(ActivityDto activityDto) {
+    	 Activity activity =  dtoMapper.convertToEntity(activityDto, Activity.class);
         Supplier supplier = supplierRepository.findById(activityDto.getSupplier().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Supplier not found with ID: " + activityDto.getSupplier().getId()));
 
-        activityDto.setSupplier(SupplierDto.convertToDto(supplier, false));
-        Activity activity = ActivityDto.convertToEntity(activityDto);
+        
+        activity.setSupplier(supplier);
+        
+       
 
         // Save the new Activity
         Activity savedActivity = activityRepository.save(activity);
 
-        // Convert back to DTO and return
-        return ActivityDto.convertToDto(savedActivity);
+        return dtoMapper.convertToDto(savedActivity, ActivityDto.class);
     }
 
 }

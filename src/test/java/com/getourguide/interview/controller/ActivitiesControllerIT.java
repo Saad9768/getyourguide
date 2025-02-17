@@ -22,6 +22,7 @@ import com.getourguide.interview.dto.ActivityDto;
 import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Activity;
 import com.getourguide.interview.entity.Supplier;
+import com.getourguide.interview.mapper.DTOMapper;
 import com.getourguide.interview.repository.ActivityRepository;
 import com.getourguide.interview.repository.SupplierRepository;
 
@@ -43,6 +44,9 @@ public class ActivitiesControllerIT {
     private ObjectMapper objectMapper;
 
     private Supplier testSupplier;
+    
+    @Autowired
+    private DTOMapper dtoMapper; 
 
     @BeforeEach
     void setUp() {
@@ -91,8 +95,18 @@ public class ActivitiesControllerIT {
 
     @Test
     void testAddActivity() throws Exception {
-        ActivityDto activityDto = new ActivityDto(null, "Hamburg Cruise", 70, "EUR", 4.7, false, testSupplier.getName(), SupplierDto.convertToDto(testSupplier, false));
-
+	
+    	ActivityDto activityDto = new ActivityDto();
+    	activityDto.setId(null);
+    	activityDto.setTitle("Hamburg Cruise");
+    	activityDto.setPrice(70);
+    	activityDto.setCurrency("EUR");
+    	activityDto.setRating(4.7);
+    	activityDto.setSpecialOffer(false);
+    	
+    	SupplierDto supplierDto = dtoMapper.convertToDto(testSupplier, SupplierDto.class);
+    	activityDto.setSupplier(supplierDto);
+    	
         mockMvc.perform(post("/activities")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(activityDto)))

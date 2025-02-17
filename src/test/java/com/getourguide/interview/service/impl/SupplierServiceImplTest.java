@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Supplier;
+import com.getourguide.interview.mapper.DTOMapper;
 import com.getourguide.interview.repository.SupplierRepository;
 
 public class SupplierServiceImplTest {
@@ -31,6 +32,9 @@ public class SupplierServiceImplTest {
 
     @InjectMocks
     private SupplierServiceImpl supplierService;
+	
+	@Mock
+    private DTOMapper dTOMapper;
 
     private Supplier supplier;
     private SupplierDto supplierDto;
@@ -48,7 +52,7 @@ public class SupplierServiceImplTest {
         supplier.setCity("Test City");
         supplier.setCountry("Test Country");
 
-        supplierDto = SupplierDto.convertToDto(supplier,false);
+        supplierDto = dTOMapper.convertToDto(supplier, SupplierDto.class);
         pageable = PageRequest.of(0, 10);
     }
 

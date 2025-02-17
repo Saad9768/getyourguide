@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.getourguide.interview.dto.SupplierDto;
 import com.getourguide.interview.entity.Supplier;
+import com.getourguide.interview.mapper.DTOMapper;
 import com.getourguide.interview.repository.SupplierRepository;
 import com.getourguide.interview.service.SupplierService;
 
@@ -21,15 +22,15 @@ import lombok.AllArgsConstructor;
 public class SupplierServiceImpl implements SupplierService {
 
     private final SupplierRepository supplierRepository;
+	
+	private final DTOMapper dtoMapper;
 
     @Override
     public Page<SupplierDto> getSuppliers(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Supplier> suppliers = supplierRepository.findAll(pageable);
-
-        List<SupplierDto> supplierDtos = suppliers.getContent().stream()
-                .map(supplier -> SupplierDto.convertToDto(supplier, true))
-                .collect(Collectors.toList());
+        
+        List<SupplierDto> supplierDtos = dtoMapper.convertListToDtoList(suppliers.getContent(), SupplierDto.class);
 
         return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
     }
@@ -41,10 +42,7 @@ public class SupplierServiceImpl implements SupplierService {
                 .findByNameContainingOrAddressContainingOrZipContainingOrCityContainingOrCountryContaining(
                         search, search, search, search, search, pageable);
 
-        List<SupplierDto> supplierDtos = suppliers.getContent().stream()
-                .map(supplier -> SupplierDto.convertToDto(supplier, true))
-                .collect(Collectors.toList());
-
+        List<SupplierDto> supplierDtos = dtoMapper.convertListToDtoList(suppliers.getContent(), SupplierDto.class);
         return new PageImpl<>(supplierDtos, pageable, suppliers.getTotalElements());
     }
 
@@ -58,6 +56,6 @@ public class SupplierServiceImpl implements SupplierService {
         supplier.setCountry(supplierDto.getCountry());
 
         Supplier savedSupplier = supplierRepository.save(supplier);
-        return SupplierDto.convertToDto(savedSupplier, true);
+        return dtoMapper.convertToDto(savedSupplier, SupplierDto.class);
     }
 }
