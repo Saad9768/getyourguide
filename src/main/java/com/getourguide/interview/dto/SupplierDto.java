@@ -1,5 +1,7 @@
 package com.getourguide.interview.dto;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -14,17 +16,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-public class ActivityDto {
+public class SupplierDto {
 
 	private Long id;
-	private String title;
-	private int price;
-	private String currency;
-	private double rating;
-	private boolean specialOffer;
-	private String supplierName;
+	private String name;
+	private String address;
+	private String zip;
+	private String city;
+	private String country;
 
-	@JsonIgnoreProperties({ "activities" })
-	private SupplierDto supplier;
-
+	@JsonIgnoreProperties({ "supplier" })
+	private List<ActivityDto> activities;
 }
